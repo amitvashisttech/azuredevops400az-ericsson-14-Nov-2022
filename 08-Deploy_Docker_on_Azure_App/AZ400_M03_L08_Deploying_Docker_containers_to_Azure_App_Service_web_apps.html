@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>
+            AZ400-DesigningandImplementingMicrosoftDevOpsSolutions
+        </title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <link rel="stylesheet" href="/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions/assets/css/style.css?v=9ffb33d3d0402f7819ff57d079d2e7d0ea5edbc8">
+    </head>
+    <body data-spy="scroll" data-target="#linksMenu">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-gray">
+        <div class="container d-flex justify-content-between">
+            <a class="my-1 title text-white" href="https://docs.microsoft.com/training/">
+                <img src="https://github.com/MicrosoftLearning/Jekyll-Theme/raw/master/assets/microsoft-gray.png" alt="Microsoft logo" style="width:100px;height:21px;"/>
+            </a>
+            <span class="my-1 title text-black">Microsoft Learn</span>
+            <span class="ml-2"><a href="https://microsoftlearning.github.io/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions">&#8801;</a></span>
+        </div>
+        <!--
+        <div class="container d-flex justify-content-between">
+            <a class="my-1 title text-azure text-uppercase" href="https://microsoftlearning.github.io/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions">
+                AZ400-DesigningandImplementingMicrosoftDevOpsSolutions
+            </a>
+            <a href="https://github.com/MicrosoftLearning/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions" target="_blank" class="btn btn-sm btn-outline-secondary text-light">
+                <i class="fa fa-github" aria-hidden="true"></i>
+                <span class="ml-2">GitHub</span>
+            </a>
+        </div>
+        -->
+    </nav>
+    <hr color-"gray"/>
+    <div class="container">
+        <main class="row extra-padding">
+            <aside class="col-sm-2">       
+                <nav id="linksMenu" class="toc sticky-top">
+                    <ul class="nav navbar-nav flex-column">
+                    </ul>
+                </nav>         
+            </aside>
+            <hr class="" />
+            <article class="col-sm-10 mb-5">
+                <h1 id="lab-08-deploying-docker-containers-to-azure-app-service-web-apps">Lab 08: Deploying Docker containers to Azure App Service web apps</h1>
+
+<h1 id="student-lab-manual">Student lab manual</h1>
+
+<h2 id="lab-requirements">Lab requirements</h2>
+
+<ul>
+  <li>
+    <p>This lab requires <strong>Microsoft Edge</strong> or an <a href="https://docs.microsoft.com/en-us/azure/devops/server/compatibility?view=azure-devops#web-portal-supported-browsers">Azure DevOps supported browser.</a></p>
+  </li>
+  <li>
+    <p><strong>Set up an Azure DevOps organization:</strong> If you don’t already have an Azure DevOps organization that you can use for this lab, create one by following the instructions available at <a href="https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops">Create an organization or project collection</a>.</p>
+  </li>
+  <li>
+    <p>Identify an existing Azure subscription or create a new one.</p>
+  </li>
+  <li>
+    <p>Verify that you have a Microsoft account or an Azure AD account with the Contributor or the Owner role in the Azure subscription. For details, refer to <a href="https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-list-portal">List Azure role assignments using the Azure portal</a> and <a href="https://docs.microsoft.com/en-us/azure/active-directory/roles/manage-roles-portal#view-my-roles">View and assign administrator roles in Azure Active Directory</a>.</p>
+  </li>
+</ul>
+
+<h2 id="lab-overview">Lab overview</h2>
+
+<p>In this lab, you will learn how to use an Azure DevOps CI/CD pipeline to build a custom Docker image, push it to Azure Container Registry, and deploy it as a container to Azure App Service.</p>
+
+<h2 id="objectives">Objectives</h2>
+
+<p>After you complete this lab, you will be able to:</p>
+
+<ul>
+  <li>Build a custom Docker image by using an Microsoft hosted Linux agent.</li>
+  <li>Push an image to Azure Container Registry.</li>
+  <li>Deploy a Docker image as a container to Azure App Service by using Azure DevOps.</li>
+</ul>
+
+<h2 id="estimated-timing-60-minutes">Estimated timing: 60 minutes</h2>
+
+<h2 id="instructions">Instructions</h2>
+
+<h3 id="exercise-1-configure-the-lab-prerequisites">Exercise 1: Configure the lab prerequisites</h3>
+
+<p>In this exercise, you will set up the prerequisites for the lab, which consist of a team project based on an Azure DevOps Demo Generator template and Azure resources, including an Azure App Service web app, an Azure Container Registry instance, and an Azure SQL database.</p>
+
+<h4 id="task-1-configure-the-team-project">Task 1: Configure the team project</h4>
+
+<p>In this task, you will use Azure DevOps Demo Generator to generate a new project based on the Docker template.</p>
+
+<blockquote>
+  <p><strong>Note</strong>: The Docker template-based project builds and deploys a containerized ASP.NET Core app to Azure App Service</p>
+</blockquote>
+
+<ol>
+  <li>
+    <p>On your lab computer, start a web browser and navigate to <a href="https://azuredevopsdemogenerator.azurewebsites.net">Azure DevOps Demo Generator</a>. This utility site will automate the process of creating a new Azure DevOps project within your account that is prepopulated with content (work items, repos, etc.) required for the lab.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: For more information on the site, see  <a href="https://docs.microsoft.com/en-us/azure/devops/demo-gen">https://docs.microsoft.com/en-us/azure/devops/demo-gen</a>.</p>
+    </blockquote>
+  </li>
+  <li>Click <strong>Sign in</strong> and sign in using the Microsoft account associated with your Azure DevOps subscription.</li>
+  <li>If required, on the <strong>Azure DevOps Demo Generator</strong> page, click <strong>Accept</strong> to accept the permission requests for accessing your Azure DevOps subscription.</li>
+  <li>On the <strong>Create New Project</strong> page, in the <strong>New Project Name</strong> textbox, type <strong>Deploying Docker containers to Azure App Service web apps</strong>, in the <strong>Select organization</strong> dropdown list, select your Azure DevOps organization, and then click <strong>Choose template</strong>.</li>
+  <li>In the list of templates, in the toolbar, click <strong>DevOps Labs</strong>, select the <strong>DevOps Labs</strong> header, click the <strong>Docker</strong> template, and then click <strong>Select Template</strong>.</li>
+  <li>
+    <p>Back on the <strong>Create New Project</strong> page, if prompted to install missing extensions, select the checkbox below the <strong>Docker Integration</strong> label and click <strong>Create Project</strong>.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: Wait for the process to complete. This should take about 2 minutes. In case the process fails, navigate to your DevOps organization, delete the project, and try again.</p>
+    </blockquote>
+  </li>
+  <li>On the <strong>Create New Project</strong> page, click <strong>Navigate to project</strong>.</li>
+</ol>
+
+<h4 id="task-2-create-azure-resources">Task 2: Create Azure resources</h4>
+
+<p>In this task, you will use Azure Cloud Shell to create Azure resources required in this lab:</p>
+
+<ul>
+  <li>Azure Container Registry</li>
+  <li>Azure Web App for Containers</li>
+  <li>Azure SQL Database</li>
+</ul>
+
+<ol>
+  <li>From the lab computer, start a web browser, navigate to the <a href="https://portal.azure.com"><strong>Azure Portal</strong></a>, and sign in with the user account that has the Owner role in the Azure subscription you will be using in this lab and has the role of the Global Administrator in the Azure AD tenant associated with this subscription.</li>
+  <li>In the web browser displaying the Azure portal, in the toolbar, click the <strong>Cloud Shell</strong> icon located directly to the right of the search text box.</li>
+  <li>
+    <p>If prompted to select either <strong>Bash</strong> or <strong>PowerShell</strong>, select <strong>Bash</strong>.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: If this is the first time you are starting <strong>Cloud Shell</strong> and you are presented with the <strong>You have no storage mounted</strong> message, select the subscription you are using in this lab, and select <strong>Create storage</strong>.</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>From the <strong>Bash</strong> session in the Cloud Shell pane, run the following to create variables representing the Azure region where you will deploy resources in this lab, the resource group containing these resources, as well as the names of these resources, including an Azure Container Registry instance, an Azure App Service plan name, an Azure web app name, an Azure SQL Database logical server name, and an Azure SQL database name:</p>
+  </li>
+  <li>
+    <p>From the Bash session in the Cloud Shell pane, run the following to create the resource group that will host Azure resources you deploy in this lab (replace the <code>&lt;Azure_region&gt;</code> placeholder with the name of the Azure region, such as ‘eastus’, where you intend to deploy these resources):</p>
+
+    <pre><code class="language-bash"> LOCATION='&lt;Azure_region&gt;'
+</code></pre>
+
+    <blockquote>
+      <p><strong>Note</strong>: You can identify Azure region names by running <code>az account list-locations -o table</code></p>
+    </blockquote>
+  </li>
+  <li>
+    <p>Run the following to create variables representing the names of Azure resources, including an Azure Container Registry instance, an Azure App Service plan name, an Azure web app name, an Azure SQL Database logical server name, and an Azure SQL database name:</p>
+
+    <pre><code class="language-bash"> RG_NAME='az400m1501a-RG'
+ ACR_NAME=az400m151acr$RANDOM$RANDOM
+ APP_SVC_PLAN='az400m1501a-app-svc-plan'
+ WEB_APP_NAME=az400m151web$RANDOM$RANDOM
+ SQLDB_SRV_NAME=az400m15sqlsrv$RANDOM$RANDOM
+ SQLDB_NAME='az400m15sqldb'
+</code></pre>
+
+    <blockquote>
+      <p><strong>Note</strong>: You can identify Azure region names by running <code>az account list-locations -o table</code></p>
+    </blockquote>
+  </li>
+  <li>
+    <p>Run the following to create all resources required Azure resources required for this lab:</p>
+
+    <pre><code class="language-bash"> az group create --name $RG_NAME --location $LOCATION
+ az acr create --name $ACR_NAME --resource-group $RG_NAME --location $LOCATION --sku Standard --admin-enabled true
+ az appservice plan create --name 'az400m1501a-app-svc-plan' --location $LOCATION --resource-group $RG_NAME --is-linux
+ az webapp create --name $WEB_APP_NAME --resource-group $RG_NAME --plan $APP_SVC_PLAN --deployment-container-image-name elnably/dockerimagetest
+ IMAGE_NAME=myhealth.web
+ az webapp config container set --name $WEB_APP_NAME --resource-group $RG_NAME --docker-custom-image-name $IMAGE_NAME --docker-registry-server-url $ACR_NAME.azurecr.io/$IMAGE_NAME:latest --docker-registry-server-url https://$ACR_NAME.azurecr.io
+ az sql server create --name $SQLDB_SRV_NAME --resource-group $RG_NAME --location $LOCATION --admin-user sqladmin --admin-password Pa55w.rd1234
+ az sql db create --name $SQLDB_NAME --resource-group $RG_NAME --server $SQLDB_SRV_NAME --service-objective S0 --no-wait 
+ az sql server firewall-rule create --name AllowAllAzure --resource-group $RG_NAME --server $SQLDB_SRV_NAME --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+</code></pre>
+
+    <blockquote>
+      <p><strong>Note</strong>: Wait for the provisioning process to complete. This might take about 5 minutes.</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>Run the following to configure a connection string of the newly created Azure web app (replace the $SQLDB_SRV_NAME and $SQLDB_NAME placeholders with the values of the names of the Azure SQL Database logical server and its database instance, respectively):</p>
+
+    <pre><code class="language-bash"> CONNECTION_STRING="Data Source=tcp:$SQLDB_SRV_NAME.database.windows.net,1433;Initial Catalog=$SQLDB_NAME;User Id=sqladmin;Password=Pa55w.rd1234;"
+ az webapp config connection-string set --name $WEB_APP_NAME --resource-group $RG_NAME --connection-string-type SQLAzure --settings defaultConnection="$CONNECTION_STRING"
+</code></pre>
+  </li>
+  <li>In the web browser displaying the Azure portal, close the Cloud Shell pane, navigate to the <strong>Resource groups</strong> blade, and, on the <strong>Resource groups</strong> blade, select the <strong>az400m1501a-RG</strong> entry.</li>
+  <li>
+    <p>On the <strong>az400m1501a-RG</strong> resource group blade, review the listing of its resources.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: Record the name of the logical Azure SQL Database server. You will need it later in this lab.</p>
+    </blockquote>
+  </li>
+  <li>On the <strong>az400m1501a-RG</strong> resource group blade, in the list of resources, click the entry representing the Container Registry instance.</li>
+  <li>On the container registry blade, in the vertical menu on the left side, in the <strong>Settings</strong> section, click <strong>Access keys</strong>.</li>
+  <li>
+    <p>On the <strong>Access keys</strong> blade of the container registry instance, identify the values of the <strong>Registry name</strong>, <strong>Login server</strong>, <strong>Admin user</strong>, and <strong>password</strong> entries.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: Record the values of <strong>Registry name</strong> and <strong>Login server</strong> (the registry names and the admin user name should match). You will need them later in this lab.</p>
+    </blockquote>
+  </li>
+</ol>
+
+<h3 id="exercise-2-deploy-a-docker-container-to-azure-app-service-web-app-using-azure-devops">Exercise 2: Deploy a Docker container to Azure App Service web app using Azure DevOps</h3>
+
+<p>In this exercise, you will deploy a Docker container to Azure App Service web app by using Azure DevOps.</p>
+
+<h4 id="task-1-configure-continuous-integration-ci-and-continuous-delivery-cd">Task 1: Configure Continuous Integration (CI) and Continuous Delivery (CD)</h4>
+
+<p>In this task, you will use the Azure DevOps project you generated in the previous exercise in order to implement a CI/CD pipeline that builds and deploys a Docker container to an Azure App Service web app.</p>
+
+<ol>
+  <li>
+    <p>On your lab computer, switch to the web browser window displaying the Azure DevOps portal with the <strong>Deploying Docker containers to Azure App Service web apps</strong> project open, in the vertical menu bar at the far left of the Azure DevOps portal, click <strong>Repos</strong>.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: You will first modify the references to the Docker image.</p>
+    </blockquote>
+  </li>
+  <li>On the <strong>Docker</strong> repository pane, in the list of files, select <strong>docker-compose.ci.build.yml</strong>.</li>
+  <li>On the <strong>docker-compose.ci.build.yml</strong> pane, click <strong>Edit</strong>, replace line <strong>5</strong> that references the target Docker image with <code>image: az400mp/aspnetcore-build:1.0-2.0</code>, select <strong>Commit</strong> and, when prompted for confirmation, click <strong>Commit</strong> again.</li>
+  <li>On the <strong>Docker</strong> repository pane, in the list of files, navigate to the <strong>src/MyHealth.Web</strong> folder and select <strong>Dockerfile</strong>.</li>
+  <li>On the <strong>Dockerfile</strong> pane, click <strong>Edit</strong>, replace line <strong>1</strong> that references the base Docker image with <code>FROM az400mp/aspnetcore1.0:1.0.4</code>, select <strong>Commit</strong> and, when prompted for confirmation, click <strong>Commit</strong> again.</li>
+  <li>
+    <p>In the web browser window displaying the Azure DevOps portal with the <strong>Deploying Docker containers to Azure App Service web apps</strong> project open, in the vertical menu bar at the far left of the Azure DevOps portal, click <strong>Pipelines</strong>.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: You will now modify the build pipeline.</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>On the <strong>Pipelines</strong> pane, click the entry representing the <strong>MHCDocker.build</strong> pipeline and, on the <strong>MHCDocker.build</strong> pane, click <strong>Edit</strong>.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: The build pipeline consists of the following tasks</p>
+    </blockquote>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tasks</th>
+          <th>Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Run services</strong></td>
+          <td>prepares the build environment by restoring the required packages</td>
+        </tr>
+        <tr>
+          <td><strong>Build services</strong></td>
+          <td>builds the <strong>myhealth.web</strong> image</td>
+        </tr>
+        <tr>
+          <td><strong>Push services</strong></td>
+          <td>pushes the <strong>myhealth.web</strong> image tagged with <strong>$(Build.BuildId)</strong> to container registry</td>
+        </tr>
+        <tr>
+          <td><strong>Publish Artifact</strong></td>
+          <td>allows for sharing dacpac for database deployment through Azure DevOps artifacts</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>On the <strong>MHCDocker.build</strong> pipeline pane, ensure that the <strong>Pipeline</strong> entry is selected and, in the <strong>Agent Specifications</strong> drop-down list, select <strong>ubuntu-18.04</strong>.</li>
+  <li>
+    <p>On the <strong>MHCDocker.build</strong> pipeline pane, in the list of tasks of the pipeline, click the <strong>Run services</strong> task, on the <strong>Docker Compose</strong> pane on the right side, in the <strong>Azure subscription</strong> dropdown list, select the entry representing the Azure subscription you are using in this lab, and click <strong>Authorize</strong> to create the corresponding service connection. When prompted, sign in using the account with the Owner role in the Azure subscription and the Global Administrator role in the Azure AD tenant associated with the Azure subscription.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: This step creates an Azure service connection, which defines and secures a connection to the target Azure subscription, using Service Principal Authentication (SPA).</p>
+    </blockquote>
+  </li>
+  <li>In the list of tasks of the pipeline, with the <strong>Run services</strong> task selected, on the <strong>Docker Compose</strong> pane on the right side, in the <strong>Azure Container Registry</strong> dropdown list, select the entry representing the ACR instance you created earlier in this lab (<strong>refresh the list if needed</strong> or type the name of the login server).</li>
+  <li>Repeat the previous two steps to configure the <strong>Azure subscription</strong> and <strong>Azure Container Registry</strong> settings in the <strong>Build services</strong>, and <strong>Push services</strong> tasks, but, this time, instead of selecting your Azure subscription, select the newly created service connection.</li>
+  <li>
+    <p>On the same <strong>MHCDocker.build</strong> pipeline pane, at the top of the pane, click the down-facing caret next to the <strong>Save &amp; queue</strong> button, click <strong>Save</strong> to save the changes, and, when prompted again, click <strong>Save</strong>.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: Next you will modify the release pipeline.</p>
+    </blockquote>
+  </li>
+  <li>In the web browser window displaying the Azure DevOps portal, in the vertical menu bar at the far left of the Azure DevOps portal, in the <strong>Pipelines</strong> section, click <strong>Releases</strong>.</li>
+  <li>On the <strong>Pipelines / Releases</strong> pane, ensure that the <strong>MHCDocker.release</strong> entry is selected and click <strong>Edit</strong>.</li>
+  <li>
+    <p>On the <strong>All pipelines / MHCDocker.release</strong> pane, in the rectangle representing the <strong>Dev</strong> stage of the deployment, click the <strong>2 jobs, 2 tasks</strong> link.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: The release pipeline consists of the following tasks</p>
+    </blockquote>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tasks</th>
+          <th>Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Execute Azure SQL: DacpacTask</strong></td>
+          <td>deploys the dacpac artifact including the target schema and data to the Azure SQL database</td>
+        </tr>
+        <tr>
+          <td><strong>Azure App Service deploy</strong></td>
+          <td>pulls the docker image generated during the build stage from the designated container registry and deploys the image to the Azure App Service web app</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>In the list of tasks of the pipeline, click the <strong>Execute Azure SQL: DacpacTask</strong> task, on the <strong>Azure SQL Database deployment</strong> pane on the right side, in the <strong>Azure subscription</strong> dropdown list, select the entry representing the Azure service connection you created earlier in this task.</li>
+  <li>
+    <p>In the list of tasks of the pipeline, click the <strong>Azure App Service deploy</strong> task, on the <strong>Azure App Service deploy</strong> pane on the right side, in the <strong>Azure subscription</strong> dropdown list, select the entry representing the Azure service connection you created earlier in this task and, in the <strong>App Service name</strong> dropdown list, select the entry representing the Azure App Service web app you deployed earlier in this lab.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: Next you will need to configure the agent pool information required for deployment.</p>
+    </blockquote>
+  </li>
+  <li>Select the <strong>DB deployment</strong> job, on the <strong>Agent job</strong> pane on the right side, in the <strong>Agent pool</strong> dropdown list, select <strong>Azure Pipelines</strong> and, next, in the <strong>Agent Specification</strong> dropdown list, select <strong>windows-2019</strong>.</li>
+  <li>Select the <strong>Web App deployment</strong> job, on the <strong>Agent job</strong> pane on the right side, in the <strong>Agent pool</strong> dropdown list, select <strong>Azure Pipelines</strong> and, next, in the <strong>Agent Specification</strong> dropdown list, select <strong>ubuntu-18.04</strong>.</li>
+  <li>At the top of the pane, click the <strong>Variables</strong> header.</li>
+  <li>
+    <p>In the list of pipeline variables, set the values of the following variables:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ACR</td>
+          <td>Azure container registry login name you recorded in the previous exercise of this lab, including the <strong>azurecr.io</strong> suffix</td>
+        </tr>
+        <tr>
+          <td>DatabaseName</td>
+          <td><strong>az400m15sqldb</strong></td>
+        </tr>
+        <tr>
+          <td>Password</td>
+          <td><strong>Pa55w.rd1234</strong></td>
+        </tr>
+        <tr>
+          <td>SQLadmin</td>
+          <td><strong>sqladmin</strong></td>
+        </tr>
+        <tr>
+          <td>SQLserver</td>
+          <td>the name of the Azure SQL Database logical server you recorded in the previous exercise of this lab, including the <strong>database.windows.net</strong> suffix</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>In the upper right corner of the pane, click the <strong>Save</strong> button to save the changes, and, when prompted again, click <strong>OK</strong>.</li>
+</ol>
+
+<h4 id="task-2-trigger-build-and-release-pipelines-by-using-code-commit">Task 2: Trigger build and release pipelines by using code commit</h4>
+
+<p>In this exercise, you will trigger the build and release pipelines by using code commit.</p>
+
+<ol>
+  <li>
+    <p>In the web browser window displaying the Azure DevOps portal, in the vertical menu bar at the far left of the Azure DevOps portal, click <strong>Repos</strong>.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: This will automatically display the <strong>Files</strong> pane.</p>
+    </blockquote>
+  </li>
+  <li>On the <strong>Files</strong> pane, navigate to the <strong>src/MyHealth.Web/Views/Home</strong> folder and click the entry representing the <strong>Index.cshtml</strong> file and then click <strong>Edit</strong> to open it for editing.</li>
+  <li>
+    <p>On the <strong>Index.cshtml</strong> pane, in line <strong>28</strong>, change <strong>JOIN US</strong> to <strong>CONTACT US</strong> and then, in the upper right corner of the pane, click <strong>Commit</strong> and, when prompted for confirmation, click <strong>Commit</strong> again.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: This action would initiate an automatic build for the source code.</p>
+    </blockquote>
+  </li>
+  <li>In the web browser window displaying the Azure DevOps portal, in the vertical menu bar at the far left of the Azure DevOps portal, click <strong>Pipelines</strong>.</li>
+  <li>On the <strong>Pipelines</strong> pane, click the entry representing the pipeline run triggered by the commit.</li>
+  <li>On the <strong>MHCDocker.build</strong> pane, click the entry representing the pipeline run.</li>
+  <li>
+    <p>On the <strong>Summary</strong> tab of the pipeline run, in the <strong>Jobs</strong> section, click the <strong>Docker</strong> entry and, on the resulting pane, monitor the progress of individual tasks until the job successfully completes.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: The build generates a Docker image and pushes it to Azure Container Registry. Once the build completes, you will be able to review its summary.</p>
+    </blockquote>
+  </li>
+  <li>In the web browser window displaying the Azure DevOps portal, in the vertical menu bar at the far left of the Azure DevOps portal, in the <strong>Pipelines</strong> section, click <strong>Releases</strong>.</li>
+  <li>On the <strong>Releases</strong> pane, click the entry representing the latest release triggered by the successful build.</li>
+  <li>On the <strong>MHCDocker.release &gt; Release-1</strong> pane, select the rectangle representing the <strong>Dev</strong> stage.</li>
+  <li>
+    <p>On the <strong>MHCDocker.release &gt; Release-1 &gt; Dev</strong> pane, monitor the progress of the release tasks until their successful completion.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: The release deploys the docker image generated by the build process to the App Service web app. Once the release completes, you can review its summary and logs.</p>
+    </blockquote>
+  </li>
+  <li>After the release pipeline completes, switch to the web browser window displaying the <a href="https://portal.azure.com">Azure Portal</a> and navigate to the blade of the Azure App Service web app you provisioned earlier in this lab.</li>
+  <li>
+    <p>On the App Service web app, click the <strong>URL</strong> link entry representing the target web app.</p>
+
+    <blockquote>
+      <p><strong>Note</strong>: This will automatically open a new web browser tab displaying the target web site.</p>
+    </blockquote>
+  </li>
+  <li>Verify that the target web app displays the HealthClinic.biz web site, including the change that you applied to trigger the CI/CD pipeline.</li>
+</ol>
+
+<h3 id="exercise-3-remove-the-azure-lab-resources">Exercise 3: Remove the Azure lab resources</h3>
+
+<p>In this exercise, you will remove the Azure resources provisioned in this lab to eliminate unexpected charges.</p>
+
+<blockquote>
+  <p><strong>Note</strong>: Remember to remove any newly created Azure resources that you no longer use. Removing unused resources ensures you will not see unexpected charges.</p>
+</blockquote>
+
+<h4 id="task-1-remove-the-azure-lab-resources">Task 1: Remove the Azure lab resources</h4>
+
+<p>In this task, you will use Azure Cloud Shell to remove the Azure resources provisioned in this lab to eliminate unnecessary charges.</p>
+
+<ol>
+  <li>In the Azure portal, open the <strong>Bash</strong> shell session within the <strong>Cloud Shell</strong> pane.</li>
+  <li>
+    <p>List all resource groups created throughout the labs of this module by running the following command:</p>
+
+    <pre><code class="language-sh"> az group list --query "[?starts_with(name,'az400m1501')].name" --output tsv
+</code></pre>
+  </li>
+  <li>
+    <p>Delete all resource groups you created throughout the labs of this module by running the following command:</p>
+
+    <pre><code class="language-sh"> az group list --query "[?starts_with(name,'az400m1501')].[name]" --output tsv | xargs -L1 bash -c 'az group delete --name $0 --no-wait --yes'
+</code></pre>
+
+    <blockquote>
+      <p><strong>Note</strong>: The command executes asynchronously (as determined by the –nowait parameter), so while you will be able to run another Azure CLI command immediately afterwards within the same Bash session, it will take a few minutes before the resource groups are actually removed.</p>
+    </blockquote>
+  </li>
+</ol>
+
+<h2 id="review">Review</h2>
+
+<p>In this lab, you used an Azure DevOps CI/CD pipeline to build a custom Docker image, pushed it to Azure Container Registry, and deployed it as a container to Azure App Service by using Azure DevOps.</p>
+
+            </article>
+        </main>
+    </div>
+    <footer class="fixed-bottom d-print-none">
+        <nav class="navbar navbar-light bg-light d-flex justify-content-around">
+            <span class="navbar-text">
+                <i class="fa fa-github" aria-hidden="true"></i>
+                <a href="https://github.com/MicrosoftLearning/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions" target="_blank" class="ml-2">
+                    MicrosoftLearning/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions
+                </a>
+            </span>
+        </nav>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script src="/AZ400-DesigningandImplementingMicrosoftDevOpsSolutions/assets/js/script.js?v=9ffb33d3d0402f7819ff57d079d2e7d0ea5edbc8"></script>
+</body>
+
+</html>
